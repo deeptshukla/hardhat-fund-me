@@ -14,14 +14,16 @@ contract FundMe {
 
     address public immutable i_owner;
     uint256 public constant MINIMUM_USD = 50 * 10**18;
+    AggregatorV3Interface public priceFeed;
 
-    constructor() {
+    constructor(address priceFeedAddress) {
         i_owner = msg.sender;
+        priceFeed = AggregatorV3Interface(priceFeedAddress);
     }
 
     function fund() public payable {
         require(
-            msg.value.getConversionRate() >= MINIMUM_USD,
+            msg.value.getConversionRate(priceFeed) >= MINIMUM_USD,
             "You need to spend more ETH!"
         );
         addressToAmountFunded[msg.sender] += msg.value;

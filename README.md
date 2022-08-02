@@ -49,3 +49,4 @@ In deploys, we don't need to create a function and then call it like we were doi
 The hardhat-deploy adds few more functionality to hre. For now we will be using the namedAccounts. We can name our accounts (like deployer) for every chain, and can use them in the tests.
 
 
+We can use deploy function (https://github.com/wighawag/hardhat-deploy#deploymentsdeployname-options) to fill different fieds to deploy our contract
