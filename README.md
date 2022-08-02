@@ -50,3 +50,19 @@ The hardhat-deploy adds few more functionality to hre. For now we will be using 
 
 
 We can use deploy function (https://github.com/wighawag/hardhat-deploy#deploymentsdeployname-options) to fill different fieds to deploy our contract
+
+For switching between chains, we can add helper-hardhat-config.js, which can have the mapping for chainId and the ehtUsdPriceFeed. This can be used inside the if/else to get the correct chainlink address for creating the FundMe contract
+
+For the localhost chain or the hardhat network, we can create a mock which will provide us the values required.
+It is possible that the code base will have files from different solidity versions. This can be mentioned inside the harddhat-config.js
+
+We can add tags at the end of deploy scripts.
+When providing tags in the command line
+```shell
+yarn hardhat deploy --tags tag1
+```
+all the deploy scripts with the given tag will be deployed
+We can get the latest contract with deployments.get(contractName)
+
+Deploy scripts are helpful, as whenever we run yarn hardhat node to start our own network, it will run all the deploy scripts in the start itself
+
