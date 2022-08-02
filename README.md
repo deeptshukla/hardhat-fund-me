@@ -22,3 +22,10 @@ yarn hardhat
 ```
 
 This will create a basic hardhat project for you
+
+Added the FundMe.sol and PriceConverter.sol to contracts.
+Unlike remix, we have to add the chainlink interfaces.
+
+```shell
+yarn add --dev @chainlink/contracts
+```
