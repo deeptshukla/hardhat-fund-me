@@ -24,6 +24,12 @@ module.exports = {
         hardhat: {
             chainId: 31337,
         },
+        rinkeby: {
+            url: RINKEBY_RPC_URL,
+            accounts: [PRIVATE_KEY],
+            chainId: 4,
+            blockConfirmations: 6,
+        },
     },
     // solidity: "0.8.9",
     solidity: {
@@ -33,7 +39,7 @@ module.exports = {
         apiKey: ETHERSCAN_API_KEY,
     },
     gasReporter: {
-        enabled: true,
+        enabled: false,
         currency: "USD",
         outputFile: "gas-report.txt",
         noColors: true,
