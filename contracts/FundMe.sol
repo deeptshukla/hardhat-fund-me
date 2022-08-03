@@ -5,33 +5,36 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./PriceConverter.sol";
 
 error FundMe__NotOwner();
+error FundMe__LessEthSent();
 
 contract FundMe {
     using PriceConverter for uint256;
 
-    mapping(address => uint256) public addressToAmountFunded;
-    address[] public funders;
+    mapping(address => uint256) private s_addressToAmountFunded;
+    address[] private s_funders;
 
-    function getNumberOfFunders() public view returns (uint256) {
-        return funders.length;
-    }
-
-    address public immutable i_owner;
+    address private immutable i_owner;
     uint256 public constant MINIMUM_USD = 50 * 10**18;
-    AggregatorV3Interface public priceFeed;
+    AggregatorV3Interface private s_priceFeed;
 
     constructor(address priceFeedAddress) {
         i_owner = msg.sender;
-        priceFeed = AggregatorV3Interface(priceFeedAddress);
+        s_priceFeed = AggregatorV3Interface(priceFeedAddress);
+    }
+
+    function getNumberOfFunders() public view returns (uint256) {
+        return s_funders.length;
     }
 
     function fund() public payable {
-        require(
-            msg.value.getConversionRate(priceFeed) >= MINIMUM_USD,
-            "You need to spend more ETH!"
-        );
-        addressToAmountFunded[msg.sender] += msg.value;
-        funders.push(msg.sender);
+        // require(
+        //     msg.value.getConversionRate(s_priceFeed) >= MINIMUM_USD,
+        //     "You need to spend more ETH!"
+        // );
+        if (msg.value.getConversionRate(s_priceFeed) < MINIMUM_USD)
+            revert FundMe__LessEthSent();
+        s_addressToAmountFunded[msg.sender] += msg.value;
+        s_funders.push(msg.sender);
     }
 
     modifier onlyOwner() {
@@ -42,14 +45,53 @@ contract FundMe {
     function withdraw() public payable onlyOwner {
         for (
             uint256 funderIndex = 0;
+            funderIndex < s_funders.length;
+            funderIndex++
+        ) {
+            address funder = s_funders[funderIndex];
+            s_addressToAmountFunded[funder] = 0;
+        }
+        s_funders = new address[](0);
+        payable(msg.sender).transfer(address(this).balance);
+    }
+
+    function cheaperWithdraw() public payable onlyOwner {
+        address[] memory funders = s_funders;
+        // mappings cant be in memory
+        for (
+            uint256 funderIndex = 0;
             funderIndex < funders.length;
             funderIndex++
         ) {
             address funder = funders[funderIndex];
-            addressToAmountFunded[funder] = 0;
+            s_addressToAmountFunded[funder] = 0;
         }
-        funders = new address[](0);
+        s_funders = new address[](0);
         payable(msg.sender).transfer(address(this).balance);
+    }
+
+    function getOwner() public view returns (address) {
+        return i_owner;
+    }
+
+    function getFunders() public view returns (address[] memory) {
+        return s_funders;
+    }
+
+    function getFunder(uint256 index) public view returns (address) {
+        return s_funders[index];
+    }
+
+    function getAddressToAmountFunded(address funder)
+        public
+        view
+        returns (uint256)
+    {
+        return s_addressToAmountFunded[funder];
+    }
+
+    function getPriceFeed() public view returns (AggregatorV3Interface) {
+        return s_priceFeed;
     }
 
     fallback() external payable {
