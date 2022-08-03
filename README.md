@@ -66,3 +66,4 @@ We can get the latest contract with deployments.get(contractName)
 
 Deploy scripts are helpful, as whenever we run yarn hardhat node to start our own network, it will run all the deploy scripts in the start itself
 
+deployments.fixture(["tag1"]) will deploy all the contracts for us (Basically this will run the deployment scripts which we want to run with a given tag)
